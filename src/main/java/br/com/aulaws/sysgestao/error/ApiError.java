@@ -5,6 +5,9 @@ import java.util.HashMap;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 
+import lombok.Data;
+
+@Data
 @JsonInclude(value = JsonInclude.Include.NON_NULL)
 public class ApiError {
 
@@ -23,42 +26,6 @@ public class ApiError {
         this.message = message;
         this.path = path;
         this.timestamp = Instant.now().toEpochMilli();
-    }
-
-    public int getStatus() {
-        return status;
-    }
-
-    public void setStatus(int status) {
-        this.status = status;
-    }
-
-    public String getMessage() {
-        return message;
-    }
-
-    public void setMessage(String message) {
-        this.message = message;
-    }
-
-    public Long getTimestamp() {
-        return timestamp;
-    }
-
-    public void setTimestamp(Long timestamp) {
-        this.timestamp = timestamp;
-    }
-
-    public String getPath() {
-        return path;
-    }
-
-    public void setPath(String path) {
-        this.path = path;
-    }
-
-    public HashMap<String, String> getValidacaoErrorCampos() {
-        return validacaoErrorCampos;
     }
 
     public void setValidacaoErrorCampos(HashMap<String, String> validacaoErrorCampos) {

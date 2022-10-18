@@ -2,13 +2,11 @@ package br.com.aulaws.sysgestao.resource;
 
 import java.net.URI;
 import java.util.List;
-//import java.util.NoSuchElementException;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
-//import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -19,10 +17,13 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import br.com.aulaws.sysgestao.domain.Cliente;
-//import br.com.aulaws.sysgestao.error.ApiError;
+
 import br.com.aulaws.sysgestao.service.ClienteService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
+
+//import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
+//import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 @RestController
 @RequestMapping("/api/v1/clientes")
@@ -37,11 +38,12 @@ public class ClienteResource {
         if (clientes.isEmpty()) {
             return ResponseEntity.noContent().build();
         }
+
         return ResponseEntity.ok(clientes);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<?> obterPorId(@PathVariable("id") Long id) {
+    public ResponseEntity<Cliente> obterPorId(@PathVariable("id") Long id) {
         Cliente cliente;
         cliente = clienteService.findById(id);
         return ResponseEntity.ok(cliente);
@@ -67,7 +69,7 @@ public class ClienteResource {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public ResponseEntity<Void> saveCliente(@RequestBody @Valid Cliente cliente, HttpServletRequest request) {
+    public ResponseEntity<Cliente> saveCliente(@RequestBody @Valid Cliente cliente, HttpServletRequest request) {
         clienteService.save(cliente);
         String path = request.getRequestURI() + "/" + cliente.getId();
         return ResponseEntity.created(URI.create(path)).build();

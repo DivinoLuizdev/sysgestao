@@ -1,6 +1,6 @@
 package br.com.aulaws.sysgestao.error;
 
-public class NotFoundException extends RuntimeException{
+public class NotFoundException extends RuntimeException {
 
     private String message;
 
@@ -16,7 +16,5 @@ public class NotFoundException extends RuntimeException{
     public void setMessage(String message) {
         this.message = message;
     }
-    
-    
 
 }
