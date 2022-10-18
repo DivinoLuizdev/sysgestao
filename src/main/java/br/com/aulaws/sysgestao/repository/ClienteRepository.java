@@ -8,4 +8,8 @@ import br.com.aulaws.sysgestao.domain.Cliente;
 @Repository
 public interface ClienteRepository extends JpaRepository<Cliente, Long>{
     
+
+
+   
+    
 }
