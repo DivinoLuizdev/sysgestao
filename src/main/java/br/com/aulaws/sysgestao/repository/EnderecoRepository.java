@@ -3,10 +3,9 @@ package br.com.aulaws.sysgestao.repository;
 import org.springframework.stereotype.Repository;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import br.com.aulaws.sysgestao.domain.Cliente;
 import br.com.aulaws.sysgestao.domain.Endereco;
 
 @Repository
-public class EnderecoRepository extends JpaRepository<Endereco, Long> {
+public interface EnderecoRepository extends JpaRepository<Endereco, Long> {
 
 }
