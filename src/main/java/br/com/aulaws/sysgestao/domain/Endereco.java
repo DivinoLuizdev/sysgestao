@@ -1,8 +1,5 @@
 package br.com.aulaws.sysgestao.domain;
 
-import org.hibernate.validator.constraints.Range;
-import org.hibernate.validator.constraints.br.CPF;
-
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
