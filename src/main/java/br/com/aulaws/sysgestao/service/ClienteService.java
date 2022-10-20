@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import br.com.aulaws.sysgestao.domain.Cliente;
+import br.com.aulaws.sysgestao.domain.Endereco;
 import br.com.aulaws.sysgestao.error.NotFoundException;
 import br.com.aulaws.sysgestao.repository.ClienteRepository;
 
@@ -41,6 +42,10 @@ public class ClienteService {
         }
 
         clienteRepository.deleteById(id);
+    }
+
+    public Object updatePartial(Long idCliente, Endereco endereco) {
+        return null;
     }
 
 

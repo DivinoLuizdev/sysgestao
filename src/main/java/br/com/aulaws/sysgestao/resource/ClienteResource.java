@@ -4,7 +4,8 @@ import java.net.URI;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
+import org.springframework.hateoas.CollectionModel;
+import org.springframework.hateoas.IanaLinkRelations;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -13,13 +14,15 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import br.com.aulaws.sysgestao.domain.Cliente;
+ 
 
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 import br.com.aulaws.sysgestao.service.ClienteService;
-import jakarta.servlet.http.HttpServletRequest;
+ 
 import jakarta.validation.Valid;
 
 //import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
@@ -33,19 +36,38 @@ public class ClienteResource {
     private ClienteService clienteService;
 
     @GetMapping
-    public ResponseEntity<List<Cliente>> obterTodosClientes() {
+    public ResponseEntity<CollectionModel<Cliente>> obterTodosClientes() {
         List<Cliente> clientes = clienteService.findAll();
         if (clientes.isEmpty()) {
             return ResponseEntity.noContent().build();
         }
 
-        return ResponseEntity.ok(clientes);
+        for (Cliente cliente : clientes) {
+            cliente.add(linkTo(methodOn(ClienteResource.class).obterPorId(cliente.getId())).withSelfRel());
+           // cliente.add(linkTo(methodOn(ClienteResource.class).atualizarEnderecoDoCliente(cliente.getId(), null))
+            //        .withRel("endereços"));
+            cliente.add(
+                    linkTo(methodOn(ClienteResource.class).obterTodosClientes()).withRel(IanaLinkRelations.COLLECTION));
+        }
+        ;
+
+        CollectionModel<Cliente> collectionModel = CollectionModel.of(clientes);
+        collectionModel.add(linkTo(methodOn(ClienteResource.class).obterTodosClientes()).withSelfRel());
+        return ResponseEntity.ok(collectionModel);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Cliente> obterPorId(@PathVariable("id") Long id) {
+    public ResponseEntity<?> obterPorId(@PathVariable("id") Long id) {
         Cliente cliente;
         cliente = clienteService.findById(id);
+
+       /*   cliente.add(linkTo(methodOn(ClienteResource.class).obterPorId(cliente.getId())).withSelfRel());
+        cliente.add(linkTo(methodOn(ClienteResource.class).atualizarEnderecoDoCliente(cliente.getId(), null))
+                .withRel("endereços"));
+                
+                */
+
+        cliente.add(linkTo(methodOn(ClienteResource.class).obterTodosClientes()).withRel(IanaLinkRelations.COLLECTION));
         return ResponseEntity.ok(cliente);
     }
 
@@ -57,6 +79,14 @@ public class ClienteResource {
     public ResponseEntity<Cliente> atualizarCliente(@RequestBody Cliente cliente) {
         clienteService.findById(cliente.getId());
         clienteService.update(cliente);
+
+       // cliente.add(linkTo(methodOn(ClienteResource.class).obterPorId(cliente.getId())).withSelfRel());
+
+       // cliente.add(linkTo(methodOn(ClienteResource.class).atualizarEnderecoDoCliente(cliente.getId(), null))
+          //      .withRel("endereços"));
+
+        cliente.add(linkTo(methodOn(ClienteResource.class).obterTodosClientes()).withRel(IanaLinkRelations.COLLECTION));
+
         return ResponseEntity.ok(cliente);
     }
 
@@ -64,14 +94,32 @@ public class ClienteResource {
     public ResponseEntity<Void> deletarClientePorId(@PathVariable("id") Long id) {
         clienteService.deletePorId(id);
         return ResponseEntity.noContent().build();
-
     }
 
+    /**
+     * @param cliente
+     * @return
+     */
     @PostMapping
-    @ResponseStatus(HttpStatus.CREATED)
-    public ResponseEntity<Cliente> saveCliente(@RequestBody @Valid Cliente cliente, HttpServletRequest request) {
+    public ResponseEntity<Cliente> saveCliente(@RequestBody @Valid Cliente cliente) {
+
         clienteService.save(cliente);
-        String path = request.getRequestURI() + "/" + cliente.getId();
-        return ResponseEntity.created(URI.create(path)).build();
+
+        URI uri = linkTo(methodOn(ClienteResource.class).obterPorId(cliente.getId())).withSelfRel().toUri();
+
+        cliente.add(linkTo(methodOn(ClienteResource.class).obterPorId(cliente.getId())).withSelfRel());
+
+       // cliente.add(linkTo(methodOn(ClienteResource.class).atualizarEnderecoDoCliente(cliente.getId(), null))
+         //       .withRel("endereços"));
+
+        cliente.add(linkTo(methodOn(ClienteResource.class).obterTodosClientes()).withRel(IanaLinkRelations.COLLECTION));
+
+        return ResponseEntity.created(uri).body(cliente);
     }
+
+   /*  @PatchMapping("/{id}/endereco")
+    public ResponseEntity<Cliente> atualizarEnderecoDoCliente(@PathVariable("id") Long idCliente, Endereco endereco) {
+        return ResponseEntity.ok(clienteService.updatePartial(idCliente, endereco));
+
+    }*/
 }

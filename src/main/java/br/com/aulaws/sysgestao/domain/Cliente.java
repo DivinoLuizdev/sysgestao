@@ -2,6 +2,7 @@ package br.com.aulaws.sysgestao.domain;
 
 import org.hibernate.validator.constraints.Range;
 import org.hibernate.validator.constraints.br.CPF;
+import org.springframework.hateoas.Link;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
@@ -46,4 +47,8 @@ public class Cliente {
         this.endereco = endereco;
     }
 
+    public void add(Link withSelfRel) {
+    }
+
+    
 }
