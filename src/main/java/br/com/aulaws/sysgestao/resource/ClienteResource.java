@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.CollectionModel;
+import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.IanaLinkRelations;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -19,6 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import br.com.aulaws.sysgestao.domain.Cliente;
 import br.com.aulaws.sysgestao.domain.Endereco;
+import br.com.aulaws.sysgestao.domain.model_assembler.ClienteModelAssembler;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
@@ -26,8 +28,7 @@ import br.com.aulaws.sysgestao.service.ClienteService;
 
 import jakarta.validation.Valid;
 
-//import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
-//import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
+ 
 
 @RestController
 @RequestMapping("/api/v1/clientes")
@@ -35,6 +36,9 @@ public class ClienteResource {
 
     @Autowired
     private ClienteService clienteService;
+
+    @Autowired
+    private ClienteModelAssembler clienteModelAssembler;
 
     @GetMapping
     public ResponseEntity<CollectionModel<Cliente>> obterTodosClientes() {
@@ -45,9 +49,9 @@ public class ClienteResource {
 
         for (Cliente cliente : clientes) {
             cliente.add(linkTo(methodOn(ClienteResource.class).obterPorId(cliente.getId())).withSelfRel());
-            // cliente.add(linkTo(methodOn(ClienteResource.class).atualizarEnderecoDoCliente(cliente.getId(),
-            // null))
-            // .withRel("endereços"));
+            cliente.add(linkTo(methodOn(ClienteResource.class).atualizarEnderecoDoCliente(cliente.getId(),
+                    null))
+                    .withRel("endereços"));
             cliente.add(
                     linkTo(methodOn(ClienteResource.class).obterTodosClientes()).withRel(IanaLinkRelations.COLLECTION));
         }
@@ -59,21 +63,13 @@ public class ClienteResource {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<?> obterPorId(@PathVariable("id") Long id) {
+    public ResponseEntity<EntityModel<Cliente>> obterPorId(@PathVariable("id") Long id) {
         Cliente cliente;
         cliente = clienteService.findById(id);
 
-        /*
-         * cliente.add(linkTo(methodOn(ClienteResource.class).obterPorId(cliente.getId()
-         * )).withSelfRel());
-         * cliente.add(linkTo(methodOn(ClienteResource.class).atualizarEnderecoDoCliente
-         * (cliente.getId(), null))
-         * .withRel("endereços"));
-         * 
-         */
+        EntityModel<Cliente> EntityModelClient = clienteModelAssembler.toModel(cliente);
 
-        cliente.add(linkTo(methodOn(ClienteResource.class).obterTodosClientes()).withRel(IanaLinkRelations.COLLECTION));
-        return ResponseEntity.ok(cliente);
+        return ResponseEntity.ok(EntityModelClient);
     }
 
     // Método HTTP PUT serve para atualizar um objeto/recurso já existente;
@@ -81,19 +77,14 @@ public class ClienteResource {
     // PQ se não existir, o método ele vai gravar/criar um novo recurso ==> HTTP
     // POST
     @PutMapping
-    public ResponseEntity<Cliente> atualizarCliente(@RequestBody Cliente cliente) {
+    public ResponseEntity<EntityModel<Cliente>> atualizarCliente(@RequestBody Cliente cliente) {
         clienteService.findById(cliente.getId());
         clienteService.update(cliente);
 
-        // cliente.add(linkTo(methodOn(ClienteResource.class).obterPorId(cliente.getId())).withSelfRel());
+        EntityModel<Cliente> EntityModelClient = clienteModelAssembler.toModel(cliente);
 
-        // cliente.add(linkTo(methodOn(ClienteResource.class).atualizarEnderecoDoCliente(cliente.getId(),
-        // null))
-        // .withRel("endereços"));
+        return ResponseEntity.ok(EntityModelClient);
 
-        cliente.add(linkTo(methodOn(ClienteResource.class).obterTodosClientes()).withRel(IanaLinkRelations.COLLECTION));
-
-        return ResponseEntity.ok(cliente);
     }
 
     @DeleteMapping("/{id}")
@@ -107,25 +98,25 @@ public class ClienteResource {
      * @return
      */
     @PostMapping
-    public ResponseEntity<Cliente> saveCliente(@RequestBody @Valid Cliente cliente) {
+    public ResponseEntity<EntityModel<Cliente>> saveCliente(@RequestBody @Valid Cliente cliente) {
 
         clienteService.save(cliente);
 
         URI uri = linkTo(methodOn(ClienteResource.class).obterPorId(cliente.getId())).withSelfRel().toUri();
+ 
+        EntityModel<Cliente> EntityModelClient = clienteModelAssembler.toModel(cliente);
 
-        cliente.add(linkTo(methodOn(ClienteResource.class).obterPorId(cliente.getId())).withSelfRel());
+        return ResponseEntity.created(uri).body(EntityModelClient);
 
-        cliente.add(linkTo(methodOn(ClienteResource.class).atualizarEnderecoDoCliente(cliente.getId(), null))
-                .withRel("endereços"));
-
-        cliente.add(linkTo(methodOn(ClienteResource.class).obterTodosClientes()).withRel(IanaLinkRelations.COLLECTION));
-
-        return ResponseEntity.created(uri).body(cliente);
     }
 
     @PatchMapping("/{id}/endereco")
     public ResponseEntity<Object> atualizarEnderecoDoCliente(@PathVariable("id") Long idCliente, Endereco endereco) {
-        return ResponseEntity.ok(clienteService.updatePartial(idCliente, endereco));
+    Cliente  cliente = (Cliente) clienteService.updatePartial(idCliente, endereco);
+
+        EntityModel<Cliente> EntityModelClient = clienteModelAssembler.toModel(cliente);
+
+        return ResponseEntity.ok(EntityModelClient);
 
     }
 }

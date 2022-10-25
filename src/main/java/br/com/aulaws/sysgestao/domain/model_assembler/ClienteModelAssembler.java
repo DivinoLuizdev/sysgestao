@@ -24,6 +24,8 @@ public class ClienteModelAssembler implements RepresentationModelAssembler<Clien
                 linkTo(methodOn(ClienteResource.class).obterTodosClientes()).withRel(IanaLinkRelations.COLLECTION));
 
         return entityModelCliente;
+
+        
     }
 
 }
