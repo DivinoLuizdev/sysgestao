@@ -9,6 +9,7 @@ import org.springframework.hateoas.IanaLinkRelations;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -17,12 +18,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import br.com.aulaws.sysgestao.domain.Cliente;
- 
+import br.com.aulaws.sysgestao.domain.Endereco;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 import br.com.aulaws.sysgestao.service.ClienteService;
- 
+
 import jakarta.validation.Valid;
 
 //import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
@@ -44,8 +45,9 @@ public class ClienteResource {
 
         for (Cliente cliente : clientes) {
             cliente.add(linkTo(methodOn(ClienteResource.class).obterPorId(cliente.getId())).withSelfRel());
-           // cliente.add(linkTo(methodOn(ClienteResource.class).atualizarEnderecoDoCliente(cliente.getId(), null))
-            //        .withRel("endereços"));
+            // cliente.add(linkTo(methodOn(ClienteResource.class).atualizarEnderecoDoCliente(cliente.getId(),
+            // null))
+            // .withRel("endereços"));
             cliente.add(
                     linkTo(methodOn(ClienteResource.class).obterTodosClientes()).withRel(IanaLinkRelations.COLLECTION));
         }
@@ -61,11 +63,14 @@ public class ClienteResource {
         Cliente cliente;
         cliente = clienteService.findById(id);
 
-       /*   cliente.add(linkTo(methodOn(ClienteResource.class).obterPorId(cliente.getId())).withSelfRel());
-        cliente.add(linkTo(methodOn(ClienteResource.class).atualizarEnderecoDoCliente(cliente.getId(), null))
-                .withRel("endereços"));
-                
-                */
+        /*
+         * cliente.add(linkTo(methodOn(ClienteResource.class).obterPorId(cliente.getId()
+         * )).withSelfRel());
+         * cliente.add(linkTo(methodOn(ClienteResource.class).atualizarEnderecoDoCliente
+         * (cliente.getId(), null))
+         * .withRel("endereços"));
+         * 
+         */
 
         cliente.add(linkTo(methodOn(ClienteResource.class).obterTodosClientes()).withRel(IanaLinkRelations.COLLECTION));
         return ResponseEntity.ok(cliente);
@@ -80,10 +85,11 @@ public class ClienteResource {
         clienteService.findById(cliente.getId());
         clienteService.update(cliente);
 
-       // cliente.add(linkTo(methodOn(ClienteResource.class).obterPorId(cliente.getId())).withSelfRel());
+        // cliente.add(linkTo(methodOn(ClienteResource.class).obterPorId(cliente.getId())).withSelfRel());
 
-       // cliente.add(linkTo(methodOn(ClienteResource.class).atualizarEnderecoDoCliente(cliente.getId(), null))
-          //      .withRel("endereços"));
+        // cliente.add(linkTo(methodOn(ClienteResource.class).atualizarEnderecoDoCliente(cliente.getId(),
+        // null))
+        // .withRel("endereços"));
 
         cliente.add(linkTo(methodOn(ClienteResource.class).obterTodosClientes()).withRel(IanaLinkRelations.COLLECTION));
 
@@ -109,17 +115,17 @@ public class ClienteResource {
 
         cliente.add(linkTo(methodOn(ClienteResource.class).obterPorId(cliente.getId())).withSelfRel());
 
-       // cliente.add(linkTo(methodOn(ClienteResource.class).atualizarEnderecoDoCliente(cliente.getId(), null))
-         //       .withRel("endereços"));
+        cliente.add(linkTo(methodOn(ClienteResource.class).atualizarEnderecoDoCliente(cliente.getId(), null))
+                .withRel("endereços"));
 
         cliente.add(linkTo(methodOn(ClienteResource.class).obterTodosClientes()).withRel(IanaLinkRelations.COLLECTION));
 
         return ResponseEntity.created(uri).body(cliente);
     }
 
-   /*  @PatchMapping("/{id}/endereco")
-    public ResponseEntity<Cliente> atualizarEnderecoDoCliente(@PathVariable("id") Long idCliente, Endereco endereco) {
+    @PatchMapping("/{id}/endereco")
+    public ResponseEntity<Object> atualizarEnderecoDoCliente(@PathVariable("id") Long idCliente, Endereco endereco) {
         return ResponseEntity.ok(clienteService.updatePartial(idCliente, endereco));
 
-    }*/
+    }
 }

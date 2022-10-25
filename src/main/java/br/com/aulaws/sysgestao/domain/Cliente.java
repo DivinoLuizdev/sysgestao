@@ -38,6 +38,7 @@ public class Cliente {
     private Endereco endereco;
 
     public Cliente() {
+        
     }
 
     public Cliente(String nome, String cpf, String email, Endereco endereco) {
